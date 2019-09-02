@@ -7,7 +7,6 @@ var bodyParser = require('body-parser')
 const NS_PER_SEC = 1e9;
 process.env.UV_THREADPOOL_SIZE = 128;
 
-
 async function callWorkers(workerPath, options) {
 
     const nWorkers = options.nWorkers;
@@ -30,7 +29,7 @@ async function callWorkers(workerPath, options) {
         let load = {
             workerIndex: index,
             tMin: options.tMin,
-            tMax: options.tMax
+            tMax: options.tMax,
         }
 
         const worker = new Worker(workerPath, {

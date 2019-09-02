@@ -3,11 +3,20 @@ const {Worker, parentPort, workerData} = require('worker_threads');
 // Get working data
 try {
 
-    console.log("Resolution worker started");
+    console.log("Analysis worker started");
+    const options = workerData;
+    console.log(`Worker Options:`);
+    console.log(options);
 
-    const data = workerData;
+    const connection = query.newWorkerConnection(options.workerIndex);
 
-    console.log("Processing data -> "+data);
+    // Read RawFile of acquisition
+
+    // Read all indications
+
+    // Read all analysis
+
+    // Create new Analysis (analysis number 1)
 
     // Return results
 

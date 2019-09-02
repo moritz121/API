@@ -8,11 +8,21 @@ const resolutionQuery = '_';
 try {
 
     console.log("Analysis worker started");
+    const options = workerData;
+    console.log(`Worker Options:`);
+    console.log(options);
 
-    const data = workerData;
+    const connection = query.newWorkerConnection(options.workerIndex);
 
-    const connection = query.newWorkerConnection(data[1]);
-    console.log("Processing data -> "+data);
+    // Assign analyst role to worker
+
+    let analystRole = (options.workerIndex % 2) + 1;
+
+    // Get non analyzed acquisitions (by the same role)
+
+    // Create anaysis
+
+    // Generate random indications
 
     // Return results
 

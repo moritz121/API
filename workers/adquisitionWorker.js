@@ -1,7 +1,8 @@
 const {Worker, parentPort, workerData} = require('worker_threads');
 const query = require('../query');
+const fs = require('fs');
 
-const workerQuery = 'select (ID_Tube) from Tube;';
+const acquisitionQuery = 'select (ID_Tube) from Tube;';                     // That don't have an acquisition
 const analysisQuery = 'select (ID_Acquired_Tubes) from Acquired_Tubes;';
 const resolutionQuery = '_';
 
@@ -14,15 +15,25 @@ try {
 
         const connection = query.newWorkerConnection(options.workerIndex);
 
-        let tubeArray = [];
+        // Get all tubes and select one to acquire
 
-        let results = await query.queryDB(workerQuery, connection);
+        let results = await query.queryDB(acquisitionQuery, connection);
+        let tube2acquire = results[0].ID_Tube;
 
-        for(let i = 0; i<Object.keys(results).length; i++) {
-            tubeArray.push(results[i].ID_Tube);
-        }
+        console.log(`Tube selected for worker ${options.workerIndex}: ${tube2acquire}`);
 
-        console.log(`Tube array for ${options.workerIndex}: ${tubeArray}`);
+        // Acquire the selected tube (create acquisition with ID_Tube = ID_Acquisition)
+
+        // Try to generate calibration for the acquisition ( roundDown(ID_Tube/5) + 1 ) 
+
+        // Generate File
+
+        fs.writeFile(`../API_Files/acquisition${tube2acquire}.txt`, "Hello there", function(err) {
+            if(err) {
+                return console.log(`Error in file writer --> \n ${err}`)
+            }
+            console.log('File saved');
+        });
 
         // Wait random time 
 
