@@ -2,9 +2,9 @@ const {Worker, parentPort, workerData} = require('worker_threads');
 const query = require('../query');
 const fs = require('fs');
 
-const acquisitionQuery = 'select (ID_Tube) from Tube;';                     // That don't have an acquisition
-const analysisQuery = 'select (ID_Acquired_Tubes) from Acquired_Tubes;';
-const resolutionQuery = '_';
+const acquisitionQuery = `select ID_Tube from Tube as t where not exists ( select * from Aquired_Tubes as acqT where acqT.ID_Aquired_Tubes = t.ID_Tube);`;
+const acquisitionCreationQuery = `insert into Aquired_Tubes values (ID_Aquired_Tubes, AcqDate, RawFile, ID_Tube_FK, ID_Calibration_FK);`;
+const calibrationCreationQuery = `insert into Calibration values (ID_Calibration, CalDate, Equipment, ID_Work_FK);`
 
 try {
     const run = async () => {

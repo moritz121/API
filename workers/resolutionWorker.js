@@ -1,5 +1,7 @@
 const {Worker, parentPort, workerData} = require('worker_threads');
 
+const analysisCreationQuery = `insert into Analyzed_Tube values (ID_Analyzed_Tube, Method, State, ID_Analyst_FK, ID_Aquired_Tubes_FK);`;
+
 // Get working data
 try {
 
