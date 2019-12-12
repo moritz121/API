@@ -2,9 +2,9 @@ const {Worker, parentPort, workerData} = require('worker_threads');
 const query = require('../query');
 const fs = require('fs');
 
-const acquisitionQuery = `select ID_Tube from Tube as t where not exists ( select * from Aquired_Tubes as acqT where acqT.ID_Aquired_Tubes = t.ID_Tube);`;
-const acquisitionCreationQuery = `insert into Aquired_Tubes values (ID_Aquired_Tubes, AcqDate, RawFile, ID_Tube_FK, ID_Calibration_FK);`;
-const calibrationCreationQuery = `insert into Calibration values (ID_Calibration, CalDate, Equipment, ID_Work_FK);`
+const acquisitionQuery = `select ID_Tube from Tube as t where not exists ( select * from Acquired_Tubes as acqT where acqT.ID_Acquired_Tubes = t.ID_Tube);`; //Check
+const acquisitionCreationQuery = `insert into Acquired_Tubes values (ID_Acquired_Tubes, AcqDate, RawFile, ID_Tube_FK, ID_Calibration_FK);`; //Check
+const calibrationCreationQuery = `insert into Calibration values (ID_Calibration, CalDate, Equipment, ID_Work_FK);` //Check
 
 try {
     const run = async () => {
