@@ -14,10 +14,14 @@ module.exports = {
     newWorkerConnection: function(worker) {
 
         const workerConnection = mysql.createConnection({
-            host: '34.77.222.32',
-            user: 'root',
-            password: 'root',
-            database: 'db_nuclear_analisys'
+            host: 'localhost',
+            user: `${worker}`,
+            password: 'rootroot',
+            database: 'DB_NUCLEAR',
+            connectionLimit: 50,
+            acquireTimeout: 1000000,
+            queueLimit: 200
+
         });
         workerConnection.connect(function(err) {
             if (err) {

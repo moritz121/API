@@ -1,21 +1,26 @@
 const express = require('express');
 const app = express();
+const router = new express.Router();
 const {Worker, parentPort, workerData, isMainThread} = require('worker_threads');
 const query = require('./query');
 const path = require ('path');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const { performance } = require('perf_hooks');
 const NS_PER_SEC = 1e9;
 process.env.UV_THREADPOOL_SIZE = 128;
 
-async function callWorkers(workerPath, options) {
+async function callWorkers(workerPath, options, t0) {
 
     const nWorkers = options.nWorkers;
 
-    //Simulate the adquisition of the tubes
+    //Simulate the acquisition of the tubes
     let workLoads = [];
 
-    for(let i = 1; i < nWorkers+1; i++) {
+    console.log(`nWorkers: ${nWorkers}`);
+
+    for(let i = 0; i < nWorkers; i++) {
         workLoads[i] = i;
+        console.log(i<nWorkers);
     }
 
     // Worker configuration
@@ -27,7 +32,7 @@ async function callWorkers(workerPath, options) {
         }
 
         let load = {
-            workerIndex: index,
+            workerIndex: index+1,
             tMin: options.tMin,
             tMax: options.tMax,
         }
@@ -52,7 +57,8 @@ async function callWorkers(workerPath, options) {
     }));
 
     return Promise.all(promisses).then((values) => {
-        return values;
+        let t1 = performance.now();
+        return (t1 - t0);   
     }).catch(() => {
         return 0;
     });
@@ -61,41 +67,56 @@ async function callWorkers(workerPath, options) {
 
 async function benchmarkFunc(workerPath, options) {
 
-    const tStart = process.hrtime();
-    var variable = await callWorkers(workerPath, options);
-    const tDiff = process.hrtime(tStart);
-    const t = tDiff[0] * NS_PER_SEC + tDiff[1];
+    let t0 = performance.now();
+    let t = await callWorkers(workerPath, options, t0);
+
+    console.log(`-------------------------------- > ${t} < --------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    console.log(`----------------------------------------------------------------`);
+    
     return t;
 
 }
 
 // Gets'
 
- app.use(bodyParser.json());
+app.use(bodyParser.json());
 
 app.listen(8081, () => console.log('Listening on port 8081'));
+
+app.post('/api/acquisition', async (req, res) => {
+    let workerPath = path.resolve('workers/acquisitionWorker.js');
+    const tDeploy = await benchmarkFunc(workerPath, req.body.options);
+    console.log(`Results of simulation: ${tDeploy}`);
+    res.send(JSON.stringify([tDeploy]));
+});
+
+app.post('/api/analysis', async (req, res) => {
+    let workerPath = path.resolve('workers/analysisWorker.js');
+    const tDeploy = await benchmarkFunc(workerPath, req.body.options);
+    res.send(JSON.stringify([tDeploy]));
+});
+
+
+app.post('/api/resolution', async (req, res) => {
+    let workerPath = path.resolve('workers/resolutionWorker.js');
+    const tDeploy = await benchmarkFunc(workerPath, req.body.options);
+    res.send(JSON.stringify([tDeploy]));
+});
 
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.post('/api/adquisition', async (req, res) => {
-    let workerPath = path.resolve('workers/adquisitionWorker.js');
-    const tDeploy = await benchmarkFunc(workerPath, req.body.options);
-    res.send(JSON.stringify([tDeploy]));
-});
-
-app.get('/api/analisis', async (req, res) => {
-    let workerPath = path.resolve('workers/analisisWorker.js');
-    const tDeploy = await benchmarkFunc(workerPath);
-    res.send(JSON.stringify([tDeploy]));
-});
 
 
-app.get('/api/resolution', async (req, res) => {
-    let workerPath = path.resolve('workers/resolutionWorker.js');
-    const tDeploy = await benchmarkFunc(workerPath);
-    res.send(JSON.stringify([tDeploy]));
-});
+
 
 
